@@ -2,6 +2,7 @@ module JLab
     
     export to_sf, to_dp
     export JLabFitresult, getfit, plotfit
+    export linear, polynomial, gaussian, lorentzian, decay
     export movavgfilt, sgolaycoeff, sgolayfilt
     export JLabPeakset, getmountains, gethills, filterpeaks, fitpeaks
     export JLabSpectrum, readspe, plotspec

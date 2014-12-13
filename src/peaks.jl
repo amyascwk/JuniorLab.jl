@@ -240,8 +240,9 @@ function fitpeaks{T}(pks::JLabPeakset,x::Array{T,1},y::Array{T,1},ys::Array{Floa
         fit = (
             try
                 getfit(f_total,float64(x[grprng[nnz]]),float64(y[grprng[nnz]]),yerr,p0)
-            catch
+            catch e
                 #Reject peak
+                show(e)
                 println("rejected")
                 push!(fitdata,nans(2*(3*length(pkgrp)+2)))
                 i += 1

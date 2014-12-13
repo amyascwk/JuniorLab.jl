@@ -56,18 +56,20 @@ function sgolaycoeff{T<:Real}(z::Array{T,1},deg::Int64,diff::Int64=0)
 end
 
 #Apply filter
-function sgolayfilt{T<:Real}(y::Array{T,1},N::Int64;deg::Int64=2,diff::Int64=0)
+function sgolayfilt{T<:Real}(y::Array{T,1},N::Int64;deg::Int64=2,diff::Int64=0,multi::Int64=1)
     #Usage:
     #   ys = sgolayfilt(y,N)
     #   ys = sgolayfilt(x,y,N)
     #   ys = sgolayfilt(..., deg=deg)
     #   ys = sgolayfilt(..., diff=diff)
+    #   ys = sgolayfilt(..., multi=multi)
     #       y       Signal to be smoothed
     #       N       Size of window
     #       x       Distribution of signal events (default [1:length(y)] for uniform)
     #       deg     Degree of polynomial for fit
     #       diff    Number of differentiations (must be <= deg, default 0 for 
     #               smoothing)
+    #       multi   Number of times to filter
     #       ys      Smoothed signal
     
     #Check input
@@ -77,6 +79,9 @@ function sgolayfilt{T<:Real}(y::Array{T,1},N::Int64;deg::Int64=2,diff::Int64=0)
     m::Int64 = div(N-1,2)
     if 2*m+1 <= deg
         error("Fitting window N = $N is too small for polynomial fit of degree $deg.")
+    end
+    if multi < 1
+        error("Number of times to filter must be at least 1.")
     end
     
     #Initiate
@@ -101,7 +106,11 @@ function sgolayfilt{T<:Real}(y::Array{T,1},N::Int64;deg::Int64=2,diff::Int64=0)
         ys[i] = sum(a.*(i-length(y)+m).^[0:length(a)-1])
     end
     
-    return ys
+    if multi == 1
+        return ys
+    else
+        return sgolayfilt(ys,N,deg=deg,diff=0,multi=multi-1)
+    end
 end
 
 function sgolayfilt{T<:Real}(x::Array{T,1},y::Array{T,1},N::Int64;deg::Int64=2,diff::Int64=0)
@@ -112,6 +121,9 @@ function sgolayfilt{T<:Real}(x::Array{T,1},y::Array{T,1},N::Int64;deg::Int64=2,d
     m::Int64 = div(N-1,2)
     if 2*m+1 <= deg
         error("Fitting window N = $N is too small for polynomial fit of degree $deg.")
+    end
+    if multi < 1
+        error("Number of times to filter must be at least 1.")
     end
     
     #Initiate
@@ -138,7 +150,11 @@ function sgolayfilt{T<:Real}(x::Array{T,1},y::Array{T,1},N::Int64;deg::Int64=2,d
         ys[i] = sum(a.*x[i].^[0:length(a)-1])
     end
     
-    return ys
+    if multi == 1
+        return ys
+    else
+        return sgolayfilt(ys,N,deg=deg,diff=0,multi=multi-1)
+    end
 end
 
 
